@@ -1,6 +1,10 @@
 package com.alexb.mynotes;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,9 +52,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView listView=(ListView) findViewById(R.id.listView);
+        final ListView listView=(ListView) findViewById(R.id.listView);
+        SharedPreferences sharedPreferences= getApplicationContext().getSharedPreferences("com.alexb.mynotes", Context.MODE_PRIVATE);
 
-        notes.add("Example note");
+        HashSet<String> set= (HashSet<String>) sharedPreferences.getStringSet("Notes",null);
+
+        if(set==null){
+            notes.add("Example note");
+
+        }else{
+            notes= new ArrayList<>(set);
+        }
+
 
         arrayAdapter= new ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line,notes);
 
@@ -66,6 +80,34 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                final int itemToDelete=i;
+                new AlertDialog.Builder(MainActivity.this)
+                        .setIcon(android.R.drawable.ic_menu_help)
+                        .setTitle("Are you sure?")
+                        .setMessage("Do you want to delete this note??")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                notes.remove(itemToDelete);
+                                arrayAdapter.notifyDataSetChanged();
+
+                                SharedPreferences sharedPreferences= getApplicationContext().getSharedPreferences("com.alexb.mynotes", Context.MODE_PRIVATE);
+                                HashSet<String> set= new HashSet<>(MainActivity.notes);
+
+                                sharedPreferences.edit().putStringSet("notes",set).apply();
+                            }
+                        })
+                        .setNegativeButton("No", null)
+
+                        .show();
+
+                return true;
+            }
+
+        });
     }
 }

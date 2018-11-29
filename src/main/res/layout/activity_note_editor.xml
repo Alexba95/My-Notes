@@ -10,6 +10,7 @@
         android:id="@+id/editText"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:background="@android:color/holo_orange_light"
         android:ems="10"
         android:gravity="top|left"
         android:inputType="textMultiLine"

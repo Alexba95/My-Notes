@@ -1,19 +1,22 @@
 package com.alexb.mynotes;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
+import java.util.HashSet;
+
 public class NoteEditorActivity extends AppCompatActivity {
 
     int noteId;
 
     @Override
-
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_editor);
 
@@ -43,6 +46,10 @@ public class NoteEditorActivity extends AppCompatActivity {
                 MainActivity.notes.set(noteId,String.valueOf(charSequence));
                 MainActivity.arrayAdapter.notifyDataSetChanged();
 
+                SharedPreferences sharedPreferences= getApplicationContext().getSharedPreferences("com.alexb.mynotes", Context.MODE_PRIVATE);
+                HashSet<String> set= new HashSet<>(MainActivity.notes);
+
+                sharedPreferences.edit().putStringSet("notes",set).apply();
             }
 
             @Override
